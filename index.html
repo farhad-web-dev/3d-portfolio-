@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farhad | 3D Interactive Portfolio Showcase</title>
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification" content="YiTXofXgzL0b7BNLz76ZjfKQMBqYHdvXebNpvTJ4Ymk" />
+    <link rel="icon" type="image/png" href="/my-portfolio/1786354104635.png">
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #05030a;
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Three.js Background Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Overlay Content */
+        .content {
+            position: relative;
+            z-index: 2;
+            padding: 20px 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            text-align: center;
+            padding: 25px 15px;
+            background: rgba(15, 10, 30, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            backdrop-filter: blur(12px);
+        }
+
+        .logo-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+            margin-bottom: 12px;
+        }
+
+        .hero-title {
+            font-size: 2.3rem;
+            font-weight: 900;
+            color: #00f3ff;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.8), 0 0 30px rgba(255, 0, 128, 0.5);
+            letter-spacing: 3px;
+        }
+
+        .hero-subtitle {
+            font-size: 0.95rem;
+            color: #ff007f;
+            margin-top: 6px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .hero-tech {
+            font-size: 0.85rem;
+            color: #00f3ff;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .section-heading {
+            font-size: 1.4rem;
+            color: #00f3ff;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            margin: 25px 0 20px 5px;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #00f3ff;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* 3D Interactive Grid */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* 3D Tilt Card Effect */
+        .card {
+            background: rgba(18, 12, 36, 0.8);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card:hover {
+            border-color: #ff007f;
+            box-shadow: 0 0 25px rgba(255, 0, 128, 0.4);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: #00f3ff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+        }
+
+        .card-desc {
+            color: #cbd5e1;
+            font-size: 0.88rem;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            border: 1px solid #ff007f;
+            color: #ff007f;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            background: rgba(255, 0, 128, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-play {
+            flex: 1;
+            background: #00f3ff;
+            color: #0b0614;
+            border: none;
+            padding: 9px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+            transition: 0.2s;
+        }
+
+        .btn-outline {
+            flex: 1;
+            background: transparent;
+            color: #ff007f;
+            border: 2px solid #ff007f;
+            padding: 9px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #64748b;
+            font-size: 0.85rem;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Canvas Background -->
+    <div id="canvas-container"></div>
+
+    <div class="content">
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <img src="/my-portfolio/1786354104635.png" alt="Farhad Logo" class="logo-img">
+            <h1 class="hero-title">FARHAD 3D SHOWCASE</h1>
+            <p class="hero-subtitle">Project 17: Interactive Three.js Web Experience</p>
+            <p class="hero-tech">Three.js | WebGL | Canvas API | LocalStorage</p>
+        </div>
+
+        <h2 class="section-heading">FEATURED PROJECTS (1 - 16)</h2>
+
+        <!-- Project Grid (All 16 Projects) -->
+        <div class="project-grid">
+
+            <!-- 1. DevTask & Chai Manager (Project 16) -->
+            <div class="card" style="border-color: #ffb703;">
+                <div>
+                    <h3 class="card-title" style="color: #ffb703;">☕ DevTask & Chai Hub</h3>
+                    <p class="card-desc">Project 16: Weather-integrated dashboard featuring mandatory 15-min Chai Break timer & LocalStorage persistence.</p>
+                    <div class="tags">
+                        <span class="tag" style="border-color:#ffb703; color:#ffb703;">LocalStorage</span>
+                        <span class="tag" style="border-color:#ffb703; color:#ffb703;">Chai Timer</span>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Chai/" class="btn-play" style="background:#ffb703;" target="_blank">Open App</a>
+                    <a href="https://github.com/farhad-web-dev/Chai" class="btn-outline" style="border-color:#ffb703; color:#ffb703;" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 2. Zombie Shooter Game -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🔫 Shooter Game</h3>
+                    <p class="card-desc">An intense top-down survival shooter game featuring enemy waves, bullet physics, and score counter.</p>
+                    <div class="tags"><span class="tag">HTML5 Canvas</span><span class="tag">JS Physics</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Shooter-game/" class="btn-play" target="_blank">Play</a>
+                    <a href="https://github.com/farhad-web-dev/Shooter-game" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 3. Horror Game (Three.js) -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">👻 3D Horror Maze Game</h3>
+                    <p class="card-desc">An intense 3D WebGL horror maze experience with eerie audio and survival mechanics.</p>
+                    <div class="tags"><span class="tag">Three.js</span><span class="tag">WebGL</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Horror-game-/" class="btn-play" target="_blank">Play 3D</a>
+                    <a href="https://github.com/farhad-web-dev/Horror-game-" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 4. Car Game -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🚗 Car-game</h3>
+                    <p class="card-desc">An immersive arcade car-dodging game featuring custom garage lobby and vehicle shop system.</p>
+                    <div class="tags"><span class="tag">HTML5 Canvas</span><span class="tag">JavaScript</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Car-game/" class="btn-play" target="_blank">Play</a>
+                    <a href="https://github.com/farhad-web-dev/Car-game" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 5. Firdos Hosiery -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">👕 Firdos Hosiery</h3>
+                    <p class="card-desc">A professional business and clothing collection website designed with clean layouts.</p>
+                    <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Firdoshosiery/" class="btn-play" target="_blank">Live Demo</a>
+                    <a href="https://github.com/farhad-web-dev/Firdoshosiery" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 6. My Server -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🖥️ My Server</h3>
+                    <p class="card-desc">A custom web management control panel interface for tracking and managing servers.</p>
+                    <div class="tags"><span class="tag">Web Panel</span><span class="tag">JS</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/My-server." class="btn-play" target="_blank">Open</a>
+                    <a href="https://github.com/farhad-web-dev/My-server." class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 7. Infinite Runner Game -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🏃 Infinite Runner</h3>
+                    <p class="card-desc">Fast-paced endless runner game with obstacle avoidance and dynamic score tracking.</p>
+                    <div class="tags"><span class="tag">JavaScript</span><span class="tag">Canvas</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Infinite-Runner-Game/" class="btn-play" target="_blank">Play</a>
+                    <a href="https://github.com/farhad-web-dev/Infinite-Runner-Game" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 8. 2D Craft Mini-Game -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🧱 2D Craft Mini-Game</h3>
+                    <p class="card-desc">A fun interactive 2D crafting and building sandbox mini-game built for web browsers.</p>
+                    <div class="tags"><span class="tag">HTML5</span><span class="tag">JS Logic</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/2D-Craft-Mini-Game/" class="btn-play" target="_blank">Play</a>
+                    <a href="https://github.com/farhad-web-dev/2D-Craft-Mini-Game" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 9. Reaction Time -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">⚡ Reaction Time</h3>
+                    <p class="card-desc">A fast-paced reflex test app measuring reaction speeds in milliseconds.</p>
+                    <div class="tags"><span class="tag">JavaScript</span><span class="tag">DOM Math</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Reaction-time/" class="btn-play" target="_blank">Play</a>
+                    <a href="https://github.com/farhad-web-dev/Reaction-time" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 10. Mochi -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🍡 Mochi</h3>
+                    <p class="card-desc">A lightweight interactive web project featuring clean design elements and smooth JS logic.</p>
+                    <div class="tags"><span class="tag">JavaScript</span><span class="tag">UI</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Mochi/" class="btn-play" target="_blank">View</a>
+                    <a href="https://github.com/farhad-web-dev/Mochi" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 11. Mochilazy -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">⚡ Mochilazy</h3>
+                    <p class="card-desc">An optimized lazy-loading variant component built for fast browser response.</p>
+                    <div class="tags"><span class="tag">JS App</span><span class="tag">Performance</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Mochilazy/" class="btn-play" target="_blank">View</a>
+                    <a href="https://github.com/farhad-web-dev/Mochilazy" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 12. Quiz Game -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">❓ Quiz Game</h3>
+                    <p class="card-desc">An interactive quiz application featuring multiple-choice questions and score calculation.</p>
+                    <div class="tags"><span class="tag">JavaScript</span><span class="tag">DOM</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Quiz-game-" class="btn-play" target="_blank">Play</a>
+                    <a href="https://github.com/farhad-web-dev/Quiz-game-" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 13. Tic-Tac-Toe -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">❌ Tic-Tac-Toe</h3>
+                    <p class="card-desc">Classic 2-player grid puzzle game built with clean user interactions and winning logic.</p>
+                    <div class="tags"><span class="tag">HTML/CSS</span><span class="tag">JS</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/tic-tac-toe." class="btn-play" target="_blank">Play</a>
+                    <a href="https://github.com/farhad-web-dev/tic-tac-toe." class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 14. Calculator -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🧮 Calculator</h3>
+                    <p class="card-desc">A sleek neon styled utility calculator app for quick mathematical operations.</p>
+                    <div class="tags"><span class="tag">UI Design</span><span class="tag">JS Math</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Calculator-" class="btn-play" target="_blank">Open</a>
+                    <a href="https://github.com/farhad-web-dev/Calculator-" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 15. Happy Father's Day -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🎉 Happy Father's Day</h3>
+                    <p class="card-desc">A special dedicated web project created as a heartfelt family gift.</p>
+                    <div class="tags"><span class="tag">Special Gift</span><span class="tag">Web Design</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Happy-fathers-day/" class="btn-play" target="_blank">View</a>
+                    <a href="https://github.com/farhad-web-dev/Happy-fathers-day" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+            <!-- 16. Happy Father's Day 2 -->
+            <div class="card">
+                <div>
+                    <h3 class="card-title">🎁 Father's Day 2.0</h3>
+                    <p class="card-desc">An updated version of the special family tribute project with creative UI styling.</p>
+                    <div class="tags"><span class="tag">Special</span><span class="tag">HTML/CSS</span></div>
+                </div>
+                <div class="btn-group">
+                    <a href="https://farhad-web-dev.github.io/Happy-fathers-day-2/" class="btn-play" target="_blank">View</a>
+                    <a href="https://github.com/farhad-web-dev/Happy-fathers-day-2" class="btn-outline" target="_blank">Code</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Farhad | Built with Three.js & Cyberpunk Theme</p>
+    </footer>
+
+    <!-- Three.js 3D Background & Interaction Script -->
+    <script>
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // 3D Geometry (Glowing Wireframe TorusKnot)
+        const geometry = new THREE.TorusKnotGeometry(3, 0.8, 100, 16);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x00f3ff, 
+            wireframe: true 
+        });
+        const torusKnot = new THREE.Mesh(geometry, material);
+        scene.add(torusKnot);
+
+        // Particle Stars Background
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsCount = 800;
+        const starPositions = new Float32Array(starsCount * 3);
+
+        for(let i = 0; i < starsCount * 3; i++) {
+            starPositions[i] = (Math.random() - 0.5) * 50;
+        }
+
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        const starsMaterial = new THREE.PointsMaterial({ color: 0xff007f, size: 0.08 });
+        const starField = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(starField);
+
+        camera.position.z = 8;
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            torusKnot.rotation.x += 0.005;
+            torusKnot.rotation.y += 0.008;
+            starField.rotation.y -= 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 3D Card Interactive Tilt Effect
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                card.style.transform = `rotateY(${x / 12}deg) rotateX(${-y / 12}deg) translateZ(10px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)';
+            });
+        });
+    </script>
+</body>
+</html>
